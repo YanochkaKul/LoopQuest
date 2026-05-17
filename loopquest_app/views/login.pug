@@ -1,0 +1,11 @@
+doctype html
+html
+  head
+    title LoopQuest - Login
+  body
+    h1 Welcome to LoopQuest
+    h2 Log In
+    form(action="/login" method="POST")
+      input(type="text" name="username" placeholder="Username" required)
+      input(type="password" name="password" placeholder="Password" required)
+      button(type="submit") Login
