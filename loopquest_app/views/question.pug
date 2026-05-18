@@ -1,0 +1,43 @@
+doctype html
+html
+  head
+    title LoopQuest - Challenge
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    link(rel="stylesheet" href="/css/style.css")
+  body
+    .question-container
+      .header
+        span.player-name Player: #{username}
+        span.difficulty Difficulty: #{question.difficulty}
+      
+      h2 Question ##{question.question_id}
+      p.question-text !{question.question_text.replace(/\n/g, '<br>')}
+
+      form(action="/submit-answer" method="POST")
+      
+        input(type="hidden" name="question_id" value=question.question_id)
+        
+        if question.type === 'mcq'
+          // MCQ Layout: 4 Buttons
+          .options-grid
+            button.option-btn(type="submit" name="user_answer" value="A") A: #{question.optionA}
+            button.option-btn(type="submit" name="user_answer" value="B") B: #{question.optionB}
+            button.option-btn(type="submit" name="user_answer" value="C") C: #{question.optionC}
+            button.option-btn(type="submit" name="user_answer" value="D") D: #{question.optionD}
+        
+        else if question.type === 'fill'
+          // Fill-in-the-blank Layout: Input field
+          .fill-input-area
+            input(type="text" name="user_answer" placeholder="Type your answer here..." required)
+            button.submit-btn(type="submit") Submit Answer
+
+        if success
+            .message.success
+             p  #{success}
+            
+      
+        if error
+            .message.error
+             p  #{error}
+             p Correct was: #{correct_val}
+            

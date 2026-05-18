@@ -17,10 +17,8 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
     if (err) {
-        console.log("-----------------------------------------");
         console.log("ERROR: Database connection failed!");
         console.log("Make sure MySQL is running in XAMPP and 'loopquest_db' exists.");
-        console.log("-----------------------------------------");
     } else {
         console.log('Success: Connected to MySQL (loopquest_db)!');
     }
@@ -99,6 +97,80 @@ app.get('/rules', (req, res) => {
     res.render('rules', { 
         username: req.session.username 
     });
+});
+
+// Route: Display a specific question by ID (Stage 5)
+app.get('/game/question/:id', (req, res) => {
+    // Check if player is logged in
+    if (!req.session.userId) return res.redirect('/');
+
+    const questionId = req.params.id;
+
+    // Fetch question from database using the ID from the URL
+    const query = 'SELECT * FROM questions WHERE question_id = ?';
+    
+    db.execute(query, [questionId], (err, results) => {
+        if (err || results.length === 0) {
+            return res.send("Question not found or Database Error.");
+        }
+
+        const question = results[0];
+
+        // Decide which page to render based on question type (mcq or fill)
+        res.render('question', { 
+            question: question,
+            username: req.session.username 
+        });
+    });
+});
+
+//submit answer
+app.post('/submit-answer', (req, res) => {
+    if (!req.session.userId) {
+        return res.redirect('/');
+    }
+
+    const { question_id, user_answer } = req.body;
+    const query ='SELECT * FROM questions WHERE question_id = ?';
+
+    db.execute(query, [question_id], (err, results) => {
+
+        if (err || results.length === 0) {
+            return res.send("Question not found.");
+        }
+        const question = results[0];
+        
+        const playerAnswer = (user_answer || "").toString().trim().toLowerCase();
+        const correctAnswer = (question.correct_answer || "").toString().trim().toLowerCase();
+        const isCorrect = playerAnswer === correctAnswer;
+
+        const insertQuery = `INSERT INTO attempts
+        (user_id, question_id, user_answer, is_correct) VALUES (?, ?, ?, ?)`;
+
+        db.execute( insertQuery,[req.session.userId, question_id, user_answer, isCorrect ], (err) => {
+
+                if (err) {
+                    return res.send("Database error.");
+                }
+
+                res.render('question', {
+                question: question,
+                username: req.session.username,
+                success: isCorrect ? "Correct answer!" : null,
+                error: !isCorrect ? "Incorrect answer. Skip your next turn." : null,
+                correct_val: question.correct_answer // чтобы показать правильный ответ при ошибке
+            });
+                
+        });
+
+    });
+
+});
+
+
+app.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/');
 });
 
 // Server Start
