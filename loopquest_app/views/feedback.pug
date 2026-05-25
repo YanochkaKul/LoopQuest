@@ -1,0 +1,45 @@
+doctype html
+html
+  head
+    title LoopQuest - Feedback
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    link(rel="stylesheet" href="/css/style.css")
+  body
+    .feedback-container
+      //-results
+      .result-banner(class=isCorrect ? 'correct' : 'incorrect')
+        if isCorrect
+          h1 + Correct!
+          p.motivation You're mastering those loops!
+        else
+          h1 - Incorrect!
+          p.penalty Skip your next turn on the physical board.
+      
+      .details-card
+        h3 Question Recap
+        p.q-text #{questionText}
+        .answer-comparison
+          p Your answer: 
+            span.user-val #{userAnswer}
+          if !isCorrect
+            p Correct answer: 
+              span.correct-val #{correctAnswer}
+
+      //- Progress Scale
+      .progress-section
+        h3 Your Progress
+        .stats-grid
+          .stat-box
+            span.label Total:
+            span.value #{total}
+          .stat-box
+            span.label Correct:
+            span.value #{correct}
+        
+        .score-bar-container
+          .score-bar(style=`width: ${score}%`)
+          span.score-label #{score}% Accuracy
+
+      //- button to go back
+      .action-area
+        a.button.continue-btn(href="/rules") Return to Board

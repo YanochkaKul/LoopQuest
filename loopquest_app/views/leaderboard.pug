@@ -1,0 +1,30 @@
+doctype html
+html
+  head
+    title LoopQuest - Leaderboard
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    link(rel="stylesheet" href="/css/style.css")
+  body
+    .leaderboard-container
+      h1  Final Leaderboard
+      
+      table.leader-table
+        thead
+          tr
+            th Rank
+            th Player
+            th Accuracy
+        tbody
+          each player, index in players
+            tr(class=index === 0 ? 'winner-row' : '')
+              td #{index + 1}
+              td #{player.username}
+              td #{player.score}%
+      
+      if players.length > 0
+        .winner-announcement
+          h2 The Winner is: 
+          h2.winner-name #{players[0].username}! 
+
+      .action-area
+        a.button(href="/logout") Finish Game

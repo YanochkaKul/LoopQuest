@@ -14,8 +14,9 @@ html
       p.question-text !{question.question_text.replace(/\n/g, '<br>')}
 
       form(action="/submit-answer" method="POST")
-      
+
         input(type="hidden" name="question_id" value=question.question_id)
+    
         
         if question.type === 'mcq'
           // MCQ Layout: 4 Buttons
@@ -31,13 +32,8 @@ html
             input(type="text" name="user_answer" placeholder="Type your answer here..." required)
             button.submit-btn(type="submit") Submit Answer
 
-        if success
-            .message.success
-             p  #{success}
-            
-      
-        if error
-            .message.error
-             p  #{error}
-             p Correct was: #{correct_val}
+        if alreadyAnswered
+            script.
+                alert("You have already answered this question! Returning to rules.");
+                window.location.href = "/rules";
             

@@ -11,7 +11,7 @@ saltRounds = 10;
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '331501', // Your XAMPP/MySQL password
+    password: '331501', // MySQL password
     database: 'loopquest_db'
 });
 
@@ -101,36 +101,47 @@ app.get('/rules', (req, res) => {
 
 // Route: Display a specific question by ID (Stage 5)
 app.get('/game/question/:id', (req, res) => {
-    // Check if player is logged in
     if (!req.session.userId) return res.redirect('/');
 
     const questionId = req.params.id;
+    const userId = req.session.userId;
 
-    // Fetch question from database using the ID from the URL
+    // First, always fetch the question data so we have it for the page
     const query = 'SELECT * FROM questions WHERE question_id = ?';
-    
     db.execute(query, [questionId], (err, results) => {
-        if (err || results.length === 0) {
-            return res.send("Question not found or Database Error.");
-        }
-
+        if (err || results.length === 0) return res.send("Question not found.");
+        
         const question = results[0];
 
-        // Decide which page to render based on question type (mcq or fill)
-        res.render('question', { 
-            question: question,
-            username: req.session.username 
+        // Now check if the user already answered it
+        const checkAttempt = 'SELECT * FROM attempts WHERE user_id = ? AND question_id = ?';
+        db.execute(checkAttempt, [userId, questionId], (err, attempts) => {
+            if (attempts.length > 0) {
+                // Now we pass BOTH alreadyAnswered AND the question object
+                return res.render('question', { 
+                    alreadyAnswered: true,
+                    question: question, 
+                    username: req.session.username
+                });
+            }
+
+            // Normal flow: question not answered yet
+            res.render('question', { 
+                question: question,
+                username: req.session.username 
+            });
         });
     });
 });
-
-//submit answer
+// Route: Submit Answer & Show Feedback
 app.post('/submit-answer', (req, res) => {
     if (!req.session.userId) {
         return res.redirect('/');
     }
 
     const { question_id, user_answer } = req.body;
+    const userId = req.session.userId;
+
     const query ='SELECT * FROM questions WHERE question_id = ?';
 
     db.execute(query, [question_id], (err, results) => {
@@ -139,35 +150,69 @@ app.post('/submit-answer', (req, res) => {
             return res.send("Question not found.");
         }
         const question = results[0];
-        
+
+        // Sanitize and compare answers (using UpperCase to avoid case mismatch)
         const playerAnswer = (user_answer || "").toString().trim().toLowerCase();
         const correctAnswer = (question.correct_answer || "").toString().trim().toLowerCase();
         const isCorrect = playerAnswer === correctAnswer;
 
-        const insertQuery = `INSERT INTO attempts
-        (user_id, question_id, user_answer, is_correct) VALUES (?, ?, ?, ?)`;
+        // Save attempt to database
+        const insertQuery = `INSERT INTO attempts (user_id, question_id, user_answer, is_correct) VALUES (?, ?, ?, ?)`;
 
-        db.execute( insertQuery,[req.session.userId, question_id, user_answer, isCorrect ], (err) => {
+        db.execute(insertQuery, [userId, question_id, playerAnswer, isCorrect ? 1 : 0], (err) => {
+            if (err) {
+                console.error("DB Error:", err);
+                return res.send("Database error.");
+            }
 
-                if (err) {
-                    return res.send("Database error.");
-                }
+            // Calculate stats for the feedback page
+            const statsQuery = 'SELECT COUNT(*) as total, SUM(is_correct) as correct FROM attempts WHERE user_id = ?';
+            db.execute(statsQuery, [userId], (err, statsResults) => {
+                if (err) return res.send("Error calculating stats.");
 
-                res.render('question', {
-                question: question,
-                username: req.session.username,
-                success: isCorrect ? "Correct answer!" : null,
-                error: !isCorrect ? "Incorrect answer. Skip your next turn." : null,
-                correct_val: question.correct_answer // чтобы показать правильный ответ при ошибке
-            });
-                
+                const total = statsResults[0].total || 0;
+                const correct = statsResults[0].correct || 0;
+                const score = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+                // Render the feedback page instead of question page
+                res.render('feedback', {
+                    isCorrect: isCorrect,
+                    questionText: question.question_text,
+                    userAnswer: playerAnswer,
+                    correctAnswer: question.correct_answer,
+                    total: total,
+                    correct: correct,
+                    score: score
+                });
+            });    
         });
 
     });
 
 });
+// Route: Leaderboard (Final QR Code)
+app.get('/leaderboard', (req, res) => {
+    if (!req.session.userId) return res.redirect('/');
 
+    // Calculate score percentage for each player based on their attempts
+    const query = `
+        SELECT u.username, 
+               ROUND((SUM(a.is_correct) / COUNT(a.attempt_id)) * 100) as score
+        FROM users u
+        JOIN attempts a ON u.user_id = a.user_id
+        GROUP BY u.user_id
+        ORDER BY score DESC
+        LIMIT 10`;
 
+    db.execute(query, (err, players) => {
+        if (err) {
+            console.error("Leaderboard Error:", err);
+            return res.send("Database Error while fetching leaderboard.");
+        }
+        res.render('leaderboard', { players: players });
+    });
+});
+// Route: Logout
 app.get('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/');
