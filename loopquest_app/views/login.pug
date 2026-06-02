@@ -1,11 +1,15 @@
 doctype html
 html
   head
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet" href="style.css")
     title LoopQuest - Login
   body
-    h1 Welcome to LoopQuest
-    h2 Log In
-    form(action="/login" method="POST")
-      input(type="text" name="username" placeholder="Username" required)
-      input(type="password" name="password" placeholder="Password" required)
-      button(type="submit") Login
+    .question-container
+      h1 Welcome to LoopQuest
+      h2 Log In
+      form(action="/login" method="POST")
+        .options-grid
+          input.option-btn(type="text" name="username" placeholder="Username" required)
+          input.option-btn(type="password" name="password" placeholder="Password" required)
+          button.submit-btn(type="submit") Login

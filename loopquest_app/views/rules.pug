@@ -1,25 +1,16 @@
 html
   head
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet" href="style.css")
     title Game Rules
-    link(rel="stylesheet", href="/css/style.css")
-
   body
-
-    header
-      h1 Loop Quest
-
-    main
-
-      .container
-
-        .rules-box
-
+    .container 
+      main.rules-box
+          h1 Loop Quest
           h2 Game Rules
-
           p Read the instructions before starting the game.
 
           h3 How to Play
-
           ul
             li Roll the dice.
             li Move your token on the game board.
@@ -29,17 +20,11 @@ html
             li If your answer is correct, continue playing.
 
           h3 Scoring
-
-          p
-            | Final score is calculated based on:
-          
-          p
-            | Correct Answers / Total Attempts × 100%
+          .scoring-formula
+            p Final score is calculated based on:
+            p Correct Answers / Total Attempts × 100%
 
           h3 Winning Condition
-
-          p
-            | The player with the highest score wins.
-
-          p.return-message
-            | Return to the physical board to begin the game.
+          p The player with the highest score wins.
+          a.submit-btn(href="/leaderboard") View Leaderboard
+          p.return-message Return to the physical board to begin the game.

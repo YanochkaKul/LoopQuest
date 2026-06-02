@@ -1,0 +1,116 @@
+
+:root {
+    --bg-color: #0f172a;
+    --card-bg: #1e293b;
+    --accent-color: #e94560;
+    --text-color: #f8fafc;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    min-height: 100vh;
+}
+
+
+.question-container, .rules-box, .leaderboard-container {
+    width: 95vw;
+    max-width: 450px;
+    background: var(--card-bg);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+
+.option-btn, .submit-btn, input.option-btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    margin: 10px 0;
+    background: #334155;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none; 
+    text-align: center;
+}
+
+.submit-btn {
+    background: var(--accent-color);
+    font-weight: bold;
+}
+
+.option-btn:active, .submit-btn:active {
+    transform: scale(0.97);
+}
+
+/*rules page*/
+.rules-box ul {
+    text-align: left;
+    padding-left: 20px;
+    line-height: 1.6;
+}
+
+.scoring-formula {
+    background: #0f172a; 
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    margin: 15px 0;
+    border: 1px solid #334155;
+}
+
+.return-message {
+    text-align: center;
+    margin-top: 20px;
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+/* Стили для того, чтобы таблица была видна */
+.leader-table {
+    width: 100%;
+    border-collapse: collapse; /* Убирает двойные рамки */
+    margin-top: 20px;
+    background-color: #1e293b; /* Цвет фона таблицы */
+    border: 2px solid #334155; /* Внешняя граница всей таблицы */
+}
+
+.leader-table th, 
+.leader-table td {
+    border: 1px solid #334155; /* Границы вокруг каждой ячейки */
+    padding: 12px 8px;         /* Внутренние отступы, чтобы текст не лип к рамкам */
+    text-align: center;        /* Текст по центру */
+}
+
+.leader-table th {
+    background-color: #334155; /* Темный фон для шапки */
+    color: white; 
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+/* Эффект "Зебры" — каждая четная строка чуть темнее */
+.leader-table tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Выделение строки победителя (из твоего Pug) */
+.winner-row {
+    background-color: rgba(74, 222, 128, 0.1) !important; /* Легкий зеленый фон */
+    color: #4ade80; /* Зеленый текст */
+}
+
