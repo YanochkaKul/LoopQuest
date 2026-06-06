@@ -101,23 +101,26 @@ app.get('/rules', (req, res) => {
 
 // Route: Display a specific question by ID (Stage 5)
 app.get('/game/question/:id', (req, res) => {
-    if (!req.session.userId) return res.redirect('/');
+    if (!req.session.userId) 
+        return res.redirect('/');
 
     const questionId = req.params.id;
     const userId = req.session.userId;
 
-    // First, always fetch the question data so we have it for the page
+    //  fetch the question data to have it for the page
     const query = 'SELECT * FROM questions WHERE question_id = ?';
+
     db.execute(query, [questionId], (err, results) => {
-        if (err || results.length === 0) return res.send("Question not found.");
-        
+        if (err || results.length === 0) {
+            return res.send("Question not found.");
+        }
         const question = results[0];
 
-        // Now check if the user already answered it
+        // check if the user already answered it
         const checkAttempt = 'SELECT * FROM attempts WHERE user_id = ? AND question_id = ?';
         db.execute(checkAttempt, [userId, questionId], (err, attempts) => {
             if (attempts.length > 0) {
-                // Now we pass BOTH alreadyAnswered AND the question object
+                // pass BOTH alreadyAnswered AND the question object
                 return res.render('question', { 
                     alreadyAnswered: true,
                     question: question, 
@@ -160,6 +163,7 @@ app.post('/submit-answer', (req, res) => {
         const insertQuery = `INSERT INTO attempts (user_id, question_id, user_answer, is_correct) VALUES (?, ?, ?, ?)`;
 
         db.execute(insertQuery, [userId, question_id, playerAnswer, isCorrect ? 1 : 0], (err) => {
+
             if (err) {
                 console.error("DB Error:", err);
                 return res.send("Database error.");
@@ -168,7 +172,10 @@ app.post('/submit-answer', (req, res) => {
             // Calculate stats for the feedback page
             const statsQuery = 'SELECT COUNT(*) as total, SUM(is_correct) as correct FROM attempts WHERE user_id = ?';
             db.execute(statsQuery, [userId], (err, statsResults) => {
-                if (err) return res.send("Error calculating stats.");
+
+                if (err){
+                    return res.send("Error calculating stats.");
+                }
 
                 const total = statsResults[0].total || 0;
                 const correct = statsResults[0].correct || 0;
@@ -196,8 +203,7 @@ app.get('/leaderboard', (req, res) => {
 
     // Calculate score percentage for each player based on their attempts
     const query = `
-        SELECT u.username, 
-               ROUND((SUM(a.is_correct) / COUNT(a.attempt_id)) * 100) as score
+        SELECT u.username, ROUND((SUM(a.is_correct) / COUNT(a.attempt_id)) * 100) as score
         FROM users u
         JOIN attempts a ON u.user_id = a.user_id
         GROUP BY u.user_id

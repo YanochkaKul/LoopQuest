@@ -3,7 +3,7 @@ html
   head
     title LoopQuest - Challenge
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
-    link(rel="stylesheet" href="style.css")
+    link(rel="stylesheet" href="/style.css")
   body
     .question-container
       .header
@@ -32,8 +32,8 @@ html
             input(type="text" name="user_answer" placeholder="Type your answer here..." required)
             button.submit-btn(type="submit") Submit Answer
 
-        if alreadyAnswered
-            script.
-                alert("You have already answered this question! Returning to rules.");
-                window.location.href = "/rules";
+    if alreadyAnswered
+      script.
+        alert("You have already answered this question! Returning to rules.");
+        window.location.href = "/rules";
             
