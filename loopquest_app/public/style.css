@@ -23,7 +23,7 @@ body {
 
 .question-container, .rules-box, .leaderboard-container {
     width: 95vw;
-    max-width: 450px;
+    max-width: 500px;
     background: var(--card-bg);
     padding: 25px;
     border-radius: 20px;
@@ -63,7 +63,9 @@ body {
     padding-left: 20px;
     line-height: 1.6;
 }
-
+.header>span{
+    display: flex;
+}
 .scoring-formula {
     background: #0f172a; 
     padding: 15px;

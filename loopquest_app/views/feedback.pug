@@ -30,10 +30,10 @@ html
         h3 Your Progress
         .stats-grid
           .stat-box
-            span.label Total:
+            span.label Total: 
             span.value #{total}
           .stat-box
-            span.label Correct:
+            span.label Correct: 
             span.value #{correct}
         
         .score-bar-container
@@ -42,4 +42,14 @@ html
 
       //- button to go back
       .action-area
-        a.button.continue-btn(href="/rules") Return to Board
+        a.button.submit-btn(href="/rules") Return to Rules
+
+    //- Hidden field to pass server data to the external JS file
+    input#answer-status(type="hidden" value=isCorrect.toString())
+
+    //- Audio elements for game feedback
+    audio#correct-sound(src="/correct.mp3")
+    audio#wrong-sound(src="/wrong.mp3")
+
+    //- Include the external JavaScript file (placed at the bottom as required by labs)
+    script(src="/audio.js")    

@@ -10,6 +10,10 @@ html
       h2 Log In
       form(action="/login" method="POST")
         .options-grid
+          
           input.option-btn(type="text" name="username" placeholder="Username" required)
           input.option-btn(type="password" name="password" placeholder="Password" required)
+          if error
+            p.return-message #{error}
           button.submit-btn(type="submit") Login
+    

@@ -29,7 +29,7 @@ html
         else if question.type === 'fill'
           // Fill-in-the-blank Layout: Input field
           .fill-input-area
-            input(type="text" name="user_answer" placeholder="Type your answer here..." required)
+            input.option-btn(type="text" name="user_answer" placeholder="Type your answer here..." required)
             button.submit-btn(type="submit") Submit Answer
 
     if alreadyAnswered
