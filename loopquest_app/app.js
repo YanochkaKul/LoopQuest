@@ -25,7 +25,7 @@ db.connect((err) => {
 });
 
 // Setup Pug views and public folder for CSS/JS
-app.set('view engine', 'pug');
+app.set('view engine', 'pug'); 
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -45,14 +45,16 @@ app.get('/', (req, res) => {
 
 // Route: Handle Login & Auto-Registration 
 app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
+    const username = req.body.username;
+    const password = req.body.password;
 
     // Check if user already exists in the database
     const findUserQuery = 'SELECT * FROM users WHERE username = ?';
     
     db.query(findUserQuery, [username], async (err, results) => {
-        if (err) return res.status(500).send("Database Error");
-
+        if (err){
+            return res.status(500).send("Database Error");
+        }
         if (results.length > 0) {
             // Existing player: check password
             const match = await bcrypt.compare(password, results[0].password);
@@ -60,7 +62,7 @@ app.post('/login', async (req, res) => {
                 // Login successful: save data to session
                 req.session.userId = results[0].user_id;
                 req.session.username = results[0].username;
-                return res.redirect('/rules'); // Next stage: Game Menu
+                return res.redirect('/rules'); 
             } else {
                return res.render('login', { 
                     error: "This username is already occuped but your password is incorrect. Please try again: eather input correct password or choose another username ." 
@@ -219,7 +221,7 @@ app.get('/leaderboard', (req, res) => {
         res.render('leaderboard', { players: players });
     });
 });
-// // Route: Log out and clear session
+// Route: Log out and clear session
 app.get('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/');
